@@ -13,7 +13,7 @@ final ThemeData appTheme = ThemeData(
   textTheme: const TextTheme(
     // Estilo do corpo de texto médio (exemplo: textos de parágrafo)
     bodyMedium: TextStyle(
-      color: Colors.white, // Cor do texto: branco
+      color: Color.fromARGB(255, 7, 7, 7), // Cor do texto: branco
       fontSize: 16,        // Tamanho da fonte: 16 pixels
     ),
   ),
