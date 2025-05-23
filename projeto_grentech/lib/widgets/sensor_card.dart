@@ -1,48 +1,80 @@
-// Importa os widgets visuais do Flutter
 import 'package:flutter/material.dart';
 
-// Declara um widget do tipo Stateless, ou seja, sem estado interno
 class SensorCard extends StatelessWidget {
-  // Declaração das propriedades que esse card recebe:
-  final IconData icon;   // Ícone a ser exibido (ex: termômetro)
-  final String label;    // Texto com o nome do sensor (ex: Temperatura)
-  final String value;    // Valor atual (ex: 24°C)
+  final IconData icon;
+  final String label;
+  final String value;
 
-  // Construtor do widget, com os três campos obrigatórios
   const SensorCard({
     super.key,
-    required this.icon,   // O ícone precisa ser informado
-    required this.label,  // O nome também
-    required this.value,  // E o valor também
+    required this.icon,
+    required this.label,
+    required this.value,
   });
+
+  // Função para definir a cor automática baseada no label
+  Color _getColor() {
+    final labelClean = label.toLowerCase().trim();
+
+    final colorMap = {
+      'temperatura': Colors.red,
+      'umidade': Colors.blue,
+      'luminosidade': Colors.amber,
+      'vento': Colors.green,
+    };
+
+    for (var key in colorMap.keys) {
+      if (labelClean.contains(key)) {
+        return colorMap[key]!;
+      }
+    }
+
+    // Cor padrão se não encontrar nenhum match
+    return const Color.fromARGB(255, 57, 172, 47);
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Retorna um container com largura fixa
     return SizedBox(
-      width: 160, // Largura do card (ideal para usar no Wrap com espaçamento)
+      width: 183, // 📏 Largura fixa
+      height: 100, // 📏 Altura fixa
       child: Card(
-        color: Colors.white, // Cor de fundo do card
+        color: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12), // Bordas arredondadas
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(12.0), // Espaçamento interno
-          child: Column(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Ícone do sensor (ex: termômetro, gota, sol, vento)
-              Icon(icon, color: Colors.green),
-
-              const SizedBox(height: 8), // Espaçamento entre ícone e texto
-
-              // Nome do sensor em negrito (ex: "Temperatura")
-              Text(
-                label,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              Icon(
+                icon,
+                color: _getColor(),
+                size: 32,
               ),
-
-              // Valor atual do sensor (ex: "24°C")
-              Text(value),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      value,
+                      style: const TextStyle(
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
