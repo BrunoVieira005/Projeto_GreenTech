@@ -14,10 +14,10 @@ class HomeScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Seção superior com curva e logo
+            // Seção superior com curva, sombra e logo
             Stack(
               children: [
-                // Sombra por trás da curva
+                // Sombra natural aplicada na curva
                 Positioned(
                   top: 4,
                   left: 0,
@@ -26,22 +26,40 @@ class HomeScreen extends StatelessWidget {
                     clipper: CurvedClipper(),
                     child: Container(
                       height: 230,
-                      color: Colors.black.withOpacity(0.9), // sombra simulada
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            spreadRadius: 5,
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                // Curva branca por cima
+
+                // Curva branca sobreposta para reforçar a forma
                 ClipPath(
                   clipper: CurvedClipper(),
-                  child: Container(height: 230, color: Colors.white),
+                  child: Container(
+                    height: 230,
+                    color: Colors.white,
+                  ),
                 ),
-                // Logo centralizada por cima
+
+                // Logo centralizada
                 Positioned.fill(
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
                       padding: const EdgeInsets.only(top: 45),
-                      child: Image.asset('assets/images/logo.png', height: 170),
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        height: 170,
+                      ),
                     ),
                   ),
                 ),
@@ -64,21 +82,25 @@ class HomeScreen extends StatelessWidget {
                         icon: Icons.thermostat,
                         label: 'Temperatura',
                         value: '24°C',
+                        iconColor: Colors.red, //  Cor para temperatura
                       ),
                       SensorCard(
                         icon: Icons.water_drop,
                         label: 'Umidade do Solo',
                         value: '65%',
+                        iconColor: Colors.blue, //  Cor para umidade
                       ),
                       SensorCard(
                         icon: Icons.wb_sunny,
                         label: 'Luminosidade',
                         value: '80%',
+                        iconColor: Colors.amber, //  Cor para luminosidade
                       ),
                       SensorCard(
                         icon: Icons.air,
                         label: 'Velocidade do vento',
                         value: '12 km/h',
+                        iconColor: Color.fromARGB(255, 67, 79, 78), //  Cor para vento
                       ),
                     ],
                   ),
@@ -96,26 +118,33 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Classe que desenha a curva arredondada
+//  Classe que desenha a curva arredondada superior
 class CurvedClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     final path = Path();
 
-    path.lineTo(0, 0); // topo esquerdo
-    path.lineTo(0, size.height); // lado esquerdo até a base
+    // Começa no topo esquerdo
+    path.lineTo(0, 0);
 
-    path.lineTo(size.width * 0.6, size.height); // base até 70% da largura
+    // Vai até a base do lado esquerdo
+    path.lineTo(0, size.height);
 
-    // Curva no canto inferior direito
+    // Linha até 60% da base
+    path.lineTo(size.width * 0.6, size.height);
+
+    // Cria uma curva do ponto atual até o canto superior direito
     path.quadraticBezierTo(
       size.width,
-      size.height, // ponto de controle
+      size.height,
       size.width,
-      size.height * 0.3, // ponto final da curva
+      size.height * 0.3,
     );
 
-    path.lineTo(size.width, 0); // sobe no lado direito
+    // Linha até o topo do lado direito
+    path.lineTo(size.width, 0);
+
+    // Fecha o caminho
     path.close();
 
     return path;
