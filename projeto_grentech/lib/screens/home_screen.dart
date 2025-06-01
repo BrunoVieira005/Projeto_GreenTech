@@ -68,13 +68,13 @@ class HomeScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: [
-                  StatusCard(),
-                  SizedBox(height: 20),
-                  Wrap(
+                  const StatusCard(),
+                  const SizedBox(height: 20),
+                  const Wrap(
                     spacing: 10,
                     runSpacing: 10,
                     children: [
@@ -82,32 +82,38 @@ class HomeScreen extends StatelessWidget {
                         icon: Icons.thermostat,
                         label: 'Temperatura',
                         value: '24°C',
-                        iconColor: Colors.red, //  Cor para temperatura
+                        iconColor: Colors.red,
                       ),
                       SensorCard(
                         icon: Icons.water_drop,
                         label: 'Umidade do Solo',
                         value: '65%',
-                        iconColor: Colors.blue, //  Cor para umidade
+                        iconColor: Colors.blue,
                       ),
                       SensorCard(
                         icon: Icons.wb_sunny,
                         label: 'Luminosidade',
                         value: '80%',
-                        iconColor: Colors.amber, //  Cor para luminosidade
+                        iconColor: Colors.amber,
                       ),
                       SensorCard(
                         icon: Icons.air,
                         label: 'Velocidade do vento',
                         value: '12 km/h',
-                        iconColor: Color.fromARGB(255, 67, 79, 78), //  Cor para vento
+                        iconColor: Color.fromARGB(255, 67, 79, 78),
                       ),
                     ],
                   ),
-                  SizedBox(height: 20),
-                  ProgramacaoCard(),
-                  SizedBox(height: 20),
-                  HistoricoCard(),
+                  const SizedBox(height: 20),
+                  ProgramacaoCard(
+  programacoes: [],
+  onAdd: (novaProgramacao) {
+    print('Nova programação adicionada: $novaProgramacao');
+  },
+),
+
+                  const SizedBox(height: 20),
+                  const HistoricoCard(),
                 ],
               ),
             ),
@@ -118,7 +124,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-//  Classe que desenha a curva arredondada superior
+// Classe que desenha a curva arredondada superior
 class CurvedClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {

@@ -1,63 +1,24 @@
 import 'package:flutter/material.dart';
-
-class ProgramacaoCard extends StatelessWidget {
-  const ProgramacaoCard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Programação',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text('Próxima Irrigação'),
-                Text('08:00'),
-              ],
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  isScrollControlled: true,
-                  builder: (context) => const IrrigacaoConfigModal(),
-                );
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-              child: const Text('Adicionar Nova Programação'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+import 'package:intl/intl.dart';
+import '../models/programacao.dart';
 
 class IrrigacaoConfigModal extends StatefulWidget {
-  const IrrigacaoConfigModal({super.key});
+  final Function(Programacao) onSave;
+
+  const IrrigacaoConfigModal({
+    super.key,
+    required this.onSave,
+  });
 
   @override
   State<IrrigacaoConfigModal> createState() => _IrrigacaoConfigModalState();
 }
 
 class _IrrigacaoConfigModalState extends State<IrrigacaoConfigModal> {
-  double tempoMinutos = 10; // Tempo inicial
+  double tempoMinutos = 10;
+  DateTime dataHora = DateTime.now().add(const Duration(minutes: 1));
 
-  double get litros => tempoMinutos * 5; // Cálculo: 5 litros por minuto
+  double get litros => tempoMinutos * 5;
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +32,45 @@ class _IrrigacaoConfigModalState extends State<IrrigacaoConfigModal> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Configurar Irrigação',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          // Topo
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: const Text('Informações'),
+                      content: const Text(
+                        '✔️ 5 litros de água por minuto.\n'
+                        'Exemplo: 20 minutos = 100 litros.',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Fechar'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const Text(
+                'Configurar Irrigação',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ],
           ),
-          const SizedBox(height: 20),
 
-          // Slider de tempo
+          const SizedBox(height: 10),
+
+          // Tempo
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -98,10 +91,9 @@ class _IrrigacaoConfigModalState extends State<IrrigacaoConfigModal> {
               });
             },
           ),
-
           const SizedBox(height: 10),
 
-          // Quantidade de água
+          // Quantidade
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -109,48 +101,66 @@ class _IrrigacaoConfigModalState extends State<IrrigacaoConfigModal> {
               Text('${litros.round()} Litros'),
             ],
           ),
+          const SizedBox(height: 10),
 
-          const SizedBox(height: 20),
-
-          // Botões
+          // Data e Hora
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Botão Info
-              ElevatedButton.icon(
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Informações'),
-                      content: const Text(
-                        'O cálculo da irrigação é simples:\n\n'
-                        '✔️ 5 litros de água por minuto.\n'
-                        'Exemplo: 20 minutos = 100 litros.',
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Fechar'),
-                        )
-                      ],
-                    ),
-                  );
-                },
-                icon: const Icon(Icons.info_outline),
-                label: const Text('Informações'),
-                style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 69, 77, 83)),
-              ),
-
-              // Botão Fechar
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                child: const Text('Fechar'),
-              ),
+              const Text('Data e Hora:'),
+              Text(DateFormat('dd/MM HH:mm').format(dataHora)),
             ],
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final selected = await showDatePicker(
+                context: context,
+                initialDate: dataHora,
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 30)),
+              );
+
+              if (selected != null) {
+                final time = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.fromDateTime(dataHora),
+                );
+
+                if (time != null) {
+                  setState(() {
+                    dataHora = DateTime(
+                      selected.year,
+                      selected.month,
+                      selected.day,
+                      time.hour,
+                      time.minute,
+                    );
+                  });
+                }
+              }
+            },
+            child: const Text('Selecionar Data e Hora'),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Botão Salvar
+          ElevatedButton(
+            onPressed: () {
+              widget.onSave(
+                Programacao(
+                  tempoMinutos: tempoMinutos,
+                  litros: litros,
+                  dataHora: dataHora,
+                ),
+              );
+              Navigator.pop(context);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              minimumSize: const Size(double.infinity, 48),
+            ),
+            child: const Text('Salvar'),
           ),
         ],
       ),
