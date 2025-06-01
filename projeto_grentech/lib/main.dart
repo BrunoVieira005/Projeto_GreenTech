@@ -6,7 +6,9 @@ import 'screens/home_screen.dart';
 
 // Importa o tema visual personalizado definido no arquivo theme.dart
 import 'core/theme.dart';
-import 'models/programacao.dart';
+
+
+
 // Função principal do app, ponto de entrada da aplicação
 void main() {
   // Executa o app chamando a classe principal (GreenTechApp)

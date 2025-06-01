@@ -113,27 +113,27 @@ class _IrrigacaoConfigModalState extends State<IrrigacaoConfigModal> {
           ),
           ElevatedButton(
             onPressed: () async {
-              final selected = await showDatePicker(
+              final selectedDate = await showDatePicker(
                 context: context,
                 initialDate: dataHora,
                 firstDate: DateTime.now(),
                 lastDate: DateTime.now().add(const Duration(days: 30)),
               );
 
-              if (selected != null) {
-                final time = await showTimePicker(
+              if (selectedDate != null) {
+                final selectedTime = await showTimePicker(
                   context: context,
                   initialTime: TimeOfDay.fromDateTime(dataHora),
                 );
 
-                if (time != null) {
+                if (selectedTime != null) {
                   setState(() {
                     dataHora = DateTime(
-                      selected.year,
-                      selected.month,
-                      selected.day,
-                      time.hour,
-                      time.minute,
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      selectedTime.hour,
+                      selectedTime.minute,
                     );
                   });
                 }

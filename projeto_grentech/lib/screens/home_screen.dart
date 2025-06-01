@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../widgets/status_card.dart';
 import '../widgets/sensor_card.dart';
 import '../widgets/programacao_card.dart';
+import '../models/programacao.dart';
 import '../widgets/historico_card.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -105,7 +106,7 @@ class HomeScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  ProgramacaoCard(
+                  Programacao(
   programacoes: [],
   onAdd: (novaProgramacao) {
     print('Nova programação adicionada: $novaProgramacao');
