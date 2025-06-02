@@ -1,13 +1,11 @@
 // Importa o pacote Flutter com os componentes visuais (widgets)
 import 'package:flutter/material.dart';
 
-// Importa a tela principal do aplicativo (HomeScreen)
-import 'screens/home_screen.dart';
-
 // Importa o tema visual personalizado definido no arquivo theme.dart
 import 'core/theme.dart';
 
-
+// Importa a Splash Screen
+import 'package:projeto_grentech/screens/splash_screen.dart';
 
 // Função principal do app, ponto de entrada da aplicação
 void main() {
@@ -32,7 +30,7 @@ class GreenTechApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
 
       // Define qual será a primeira tela exibida ao abrir o app
-      home: const HomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
