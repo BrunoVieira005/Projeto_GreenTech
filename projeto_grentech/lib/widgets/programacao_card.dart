@@ -1,168 +1,114 @@
+// lib/widgets/programacao_card.dart
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart'; // Importado para formatar a data e hora
 import '../models/programacao.dart';
 
-class IrrigacaoConfigModal extends StatefulWidget {
-  final Function(Programacao) onSave;
+/// Um widget para exibir uma lista de programas de irrigação e permitir adicionar novos.
+/// Este widget é Stateless e recebe a lista de programações e uma função de callback.
+class ProgramacaoCard extends StatelessWidget {
+  /// A lista de objetos Programacao para exibir.
+  final List<Programacao> programacoes;
 
-  const IrrigacaoConfigModal({
+  /// Função de callback a ser chamada quando uma nova programação for adicionada.
+  /// Recebe o objeto Programacao recém-criado.
+  final Function(Programacao) onAdd;
+
+  /// Construtor para o widget ProgramacaoCard.
+  const ProgramacaoCard({
     super.key,
-    required this.onSave,
+    required this.programacoes,
+    required this.onAdd,
   });
 
   @override
-  State<IrrigacaoConfigModal> createState() => _IrrigacaoConfigModalState();
-}
-
-class _IrrigacaoConfigModalState extends State<IrrigacaoConfigModal> {
-  double tempoMinutos = 10;
-  DateTime dataHora = DateTime.now().add(const Duration(minutes: 1));
-
-  double get litros => tempoMinutos * 5;
-
-  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        top: 16,
-        left: 16,
-        right: 16,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Topo
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.info_outline),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Informações'),
-                      content: const Text(
-                        '✔️ 5 litros de água por minuto.\n'
-                        'Exemplo: 20 minutos = 100 litros.',
+    return Card(
+      margin: const EdgeInsets.all(0), // Margem 0, o padding é tratado pelo pai
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Programação de Irrigação',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.green,
+              ),
+            ),
+            const SizedBox(height: 10),
+            // Exibe as programações existentes
+            if (programacoes.isEmpty)
+              const Text(
+                'Nenhuma programação agendada.',
+                style: TextStyle(
+                  fontStyle: FontStyle.italic,
+                  color: Colors.grey,
+                ),
+              )
+            else
+              // Mapeia cada programação para um widget Row
+              ...programacoes.map((program) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Exibe tempo e litros, arredondando o tempo e formatando litros
+                      Text(
+                        '${program.tempoMinutos.round()} min, ${program.litros.toStringAsFixed(1)} L',
+                        style: const TextStyle(fontSize: 16),
                       ),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Fechar'),
+                      // Exibe a data e hora formatadas
+                      Text(
+                        DateFormat('dd/MM HH:mm').format(program.dataHora),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey,
                         ),
-                      ],
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(), // Converte o iterável em uma lista de widgets
+            const SizedBox(height: 15),
+            Center(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // Chama a função onAdd com uma nova programação de exemplo.
+                  // Em uma aplicação real, isso abriria um formulário para o usuário preencher.
+                  onAdd(
+                    Programacao(
+                      tempoMinutos: 15, // Valor de exemplo
+                      litros: 75.0, // Valor de exemplo (15 * 5)
+                      dataHora: DateTime.now().add(
+                        const Duration(days: 1),
+                      ), // Exemplo: amanhã
                     ),
                   );
                 },
-              ),
-              const Text(
-                'Configurar Irrigação',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 10),
-
-          // Tempo
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Tempo (min):'),
-              Text('${tempoMinutos.round()} min'),
-            ],
-          ),
-          Slider(
-            value: tempoMinutos,
-            min: 1,
-            max: 60,
-            divisions: 59,
-            label: '${tempoMinutos.round()} min',
-            activeColor: Colors.green,
-            onChanged: (value) {
-              setState(() {
-                tempoMinutos = value;
-              });
-            },
-          ),
-          const SizedBox(height: 10),
-
-          // Quantidade
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Quantidade de água:'),
-              Text('${litros.round()} Litros'),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Data e Hora
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text('Data e Hora:'),
-              Text(DateFormat('dd/MM HH:mm').format(dataHora)),
-            ],
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final selectedDate = await showDatePicker(
-                context: context,
-                initialDate: dataHora,
-                firstDate: DateTime.now(),
-                lastDate: DateTime.now().add(const Duration(days: 30)),
-              );
-
-              if (selectedDate != null) {
-                final selectedTime = await showTimePicker(
-                  context: context,
-                  initialTime: TimeOfDay.fromDateTime(dataHora),
-                );
-
-                if (selectedTime != null) {
-                  setState(() {
-                    dataHora = DateTime(
-                      selectedDate.year,
-                      selectedDate.month,
-                      selectedDate.day,
-                      selectedTime.hour,
-                      selectedTime.minute,
-                    );
-                  });
-                }
-              }
-            },
-            child: const Text('Selecionar Data e Hora'),
-          ),
-
-          const SizedBox(height: 20),
-
-          // Botão Salvar
-          ElevatedButton(
-            onPressed: () {
-              widget.onSave(
-                Programacao(
-                  tempoMinutos: tempoMinutos,
-                  litros: litros,
-                  dataHora: dataHora,
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: const Text(
+                  'Adicionar Programação',
+                  style: TextStyle(color: Colors.white),
                 ),
-              );
-              Navigator.pop(context);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              minimumSize: const Size(double.infinity, 48),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+              ),
             ),
-            child: const Text('Salvar'),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
